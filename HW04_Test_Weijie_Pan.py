@@ -1,18 +1,26 @@
+from unittest import mock
 import unittest
-from HW04_Weijie_Pan import read_github_repo
+from HW04_Weijie_Pan import read_github_repo, read_github_commit
 
 
 class GithubParserTest(unittest.TestCase):
-    """test if id: richkempinski exists"""
-    def test_github_parser(self):
-        result = {'hellogitworld': 30, 'helloworld': 6, 'Mocks': 10, 'Project1': 2, 'threads-of-life': 1}
-        self.assertEqual(read_github_repo('richkempinski'), result)
 
-    def test_github_parser2(self):
-        """test if id: bondi exists"""
-        self.assertEqual(read_github_repo('bondi'), {'bpi-print': 8, 'liquibase-demo': 9, 'server-configs-nginx': 30})
+    @mock.patch('requests.get')
+    def test_repo(self, mock_req):
+        content = [{'id': '001', 'name':'hello world'}, {'id': '002', 'name':'python'}]
+        mock_req.return_value = mock.Mock()
+        mock_req.return_value.json.return_value = content
+        response = read_github_repo("hi")
+        self.assertEqual(response, content)
+
+    @mock.patch('requests.get')
+    def test_commit(self, mock_res):
+        content = [{'id': '001', 'name': 'hello world'}, {'id': '002', 'name': 'python'}]
+        mock_res.return_value = mock.Mock()
+        mock_res.return_value.json.return_value = content
+        response = read_github_commit("hi")
+        self.assertEqual(response, {'hello world': 2, 'python': 2})
 
 
 if __name__ == '__main__':
     unittest.main(exit=False, verbosity=2)
-
